@@ -1,0 +1,4 @@
+# hasil build dan simulasi (dibuat ulang dengan make)
+build/
+sim/
+*.vcd

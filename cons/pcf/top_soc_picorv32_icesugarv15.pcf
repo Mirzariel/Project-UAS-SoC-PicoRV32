@@ -1,0 +1,40 @@
+# For the iCESugar Board (iCE40UP5K-QFN48)
+#
+# diubah: isi asli file ini memakai nama port proyek lain (rst_n, boot_stage,
+# pmu_state, pwr_good, P3_12) yang tidak ada di top_soc_picorv32. Isinya
+# diganti mengikuti port top_soc_picorv32. Nomor pin diambil dari daftar PMOD
+# di file asli ini dan master_icesugar.pcf template ABJ.
+
+set_io clock   35
+
+# TM1638 (LED & KEY) di header PMOD1, pin yang TERBUKTI menyala di board
+# (24 Nov 2026). Tidak berbagi pin dengan UART iCELink atau USB.
+# Catatan percobaan:
+#   - pin teman 47/2/3 dicoba, display tetap gelap
+#   - demo top.v dosen dicoba dengan 48/3/2 pada posisi kabel yang sama,
+#     muncul angka "523162", lalu SoC ini juga menyala dengan pin yang sama
+#   - artinya dua baris lubang PMOD1 tertukar saat kami membaca labelnya
+#   Pin dosen (9/4/2): make build PIN=dosen. Di board kami display sempat
+#   jalan sekitar 3 detik lalu macet saat iCELink aktif (J5 sudah dilepas).
+set_io tm_cs   48    #PMOD1
+set_io tm_clk  3     #PMOD1
+set_io tm_dio  2     #PMOD1
+
+# GPIO 16 bit. Semua bit harus diberi pin, kalau tidak nextpnr memilih pin
+# sendiri secara acak.
+set_io gpio[0]  40   #LED merah  (aktif rendah)
+set_io gpio[1]  41   #LED hijau  (aktif rendah)
+set_io gpio[2]  39   #LED biru   (aktif rendah)
+set_io gpio[3]  18   #SW[0]
+set_io gpio[4]  19   #SW[1]
+set_io gpio[5]  20   #SW[2]
+set_io gpio[6]  21   #SW[3]
+set_io gpio[7]  46   #P2_1
+set_io gpio[8]  44   #P2_2
+set_io gpio[9]  42   #P2_3
+set_io gpio[10] 37   #P2_4
+set_io gpio[11] 36   #P2_9
+set_io gpio[12] 38   #P2_10
+set_io gpio[13] 43   #P2_11
+set_io gpio[14] 45   #P2_12
+set_io gpio[15] 34   #P3_1
