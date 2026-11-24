@@ -1,7 +1,7 @@
 # Project UAS: SoC PicoRV32
 
 Mirzariel Akmal Norman (23/523162/TK/57284)
-TKEE262703 Digital IC Design, Dosen: Agus Bejo, D.Eng.
+TKEE262703 Digital IC Design, Dosen: Ir. Agus Bejo, S.T., M.Eng., D.Eng., IPM.
 
 SoC dengan prosesor PicoRV32, AXI4-Lite interconnect 1 master 4 slave, ROM, RAM, GPIO,
 dan pengendali modul LED&KEY TM1638, dijalankan di board **iCESugar v1.5 (iCE40UP5K)**
