@@ -10,6 +10,8 @@ Dasar proyek: template dari dosen (`uas-soc-design.zip`).
 
 **Video demo:** [dokumentasi/demo_soc_tm1638.mp4](dokumentasi/demo_soc_tm1638.mp4)
 
+**Makalah:** [dokumentasi/Makalah_Project_UAS_SoC.pdf](dokumentasi/Makalah_Project_UAS_SoC.pdf)
+
 ![SoC berjalan di iCESugar dan modul LED&KEY](dokumentasi/foto_demo.jpg)
 
 Foto diambil sekitar 7 detik setelah board dicolok: 7-segment menampilkan counter dari
