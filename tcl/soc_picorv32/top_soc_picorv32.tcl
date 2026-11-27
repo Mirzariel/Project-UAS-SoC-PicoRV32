@@ -34,12 +34,33 @@ puts "dir_cons is: ${dir_cons}"
 set top_level "${top_level_project}"
 
 #Step 1: Reading RTL
-read_verilog {*}[glob -directory "${dir_rtl}/${project_name}/interconnect"  *.v]
-read_verilog -sv {*}[glob -directory "${dir_rtl}/${project_name}/interfaces"  *.sv]
-read_verilog {*}[glob -directory "${dir_rtl}/${project_name}/peripherals"  *.v]
-read_verilog {*}[glob -directory "${dir_rtl}/${project_name}/picorv32"  *.v]
-read_verilog -sv {*}[glob -directory "${dir_rtl}/${project_name}/wrapper"  *.sv]
-read_verilog -sv {*}[glob -directory "${dir_rtl}/${project_name}"  *.sv]
+# diubah: ada dua cara membaca file, dipilih dari Makefile.
+#   make syn          -> cara A: read_verilog (bawaan Yosys)
+#   make syn SLANG=1  -> cara B: read_slang (plugin slang, seperti template V2 dosen)
+# Isi file RTL sama untuk kedua cara.
+set pakai_slang 0
+if {[info exists env(SLANG)] && $env(SLANG) == "1"} {
+    set pakai_slang 1
+}
+
+if {$pakai_slang} {
+    puts "membaca RTL dengan read_slang (cara B)"
+    plugin -i slang
+    read_slang {*}[glob -directory "${dir_rtl}/${project_name}/interfaces"   *.sv] \
+               {*}[glob -directory "${dir_rtl}/${project_name}/wrapper"      *.sv] \
+               {*}[glob -directory "${dir_rtl}/${project_name}"              *.sv] \
+               {*}[glob -directory "${dir_rtl}/${project_name}/peripherals"  *.v] \
+               {*}[glob -directory "${dir_rtl}/${project_name}/interconnect" *.v] \
+               {*}[glob -directory "${dir_rtl}/${project_name}/picorv32"     *.v]
+} else {
+    puts "membaca RTL dengan read_verilog (cara A)"
+    read_verilog {*}[glob -directory "${dir_rtl}/${project_name}/interconnect"  *.v]
+    read_verilog -sv {*}[glob -directory "${dir_rtl}/${project_name}/interfaces"  *.sv]
+    read_verilog {*}[glob -directory "${dir_rtl}/${project_name}/peripherals"  *.v]
+    read_verilog {*}[glob -directory "${dir_rtl}/${project_name}/picorv32"  *.v]
+    read_verilog -sv {*}[glob -directory "${dir_rtl}/${project_name}/wrapper"  *.sv]
+    read_verilog -sv {*}[glob -directory "${dir_rtl}/${project_name}"  *.sv]
+}
 
 # 3. Design Elaborate & Check
 # diubah: ditambah -check supaya modul yang belum ada langsung ketahuan

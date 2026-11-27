@@ -14,7 +14,7 @@ set_io clock   35
 #   - demo top.v dosen dicoba dengan 48/3/2 pada posisi kabel yang sama,
 #     muncul angka "523162", lalu SoC ini juga menyala dengan pin yang sama
 #   - artinya dua baris lubang PMOD1 tertukar saat kami membaca labelnya
-#   Pin dosen (9/4/2): make build PIN=dosen. Di board kami display sempat
+#   Pin soal (9/4/2): make build PIN=soal. Di board kami display sempat
 #   jalan sekitar 3 detik lalu macet saat iCELink aktif (J5 sudah dilepas).
 set_io tm_cs   48    #PMOD1
 set_io tm_clk  3     #PMOD1

@@ -1,11 +1,11 @@
 # For the iCESugar Board (iCE40UP5K-QFN48)
 #
 # CADANGAN: sama dengan top_soc_picorv32_icesugarv15.pcf, hanya pin TM1638
-# memakai pin dari dosen. Dipakai dengan: make build PIN=dosen
+# memakai pin yang diberikan soal. Dipakai dengan: make build PIN=soal
 
 set_io clock   35
 
-# Pin TM1638 dari top.pcf dosen (project ABJ). Di board kami display sempat
+# Pin TM1638 yang diberikan soal (sama dengan top.pcf project ABJ). Di board kami display sempat
 # jalan sekitar 3 detik lalu macet saat iCELink aktif, penyebabnya belum diketahui.
 #   catatan: pin 9 juga dipakai USB_DN dan pin 4 juga dipakai UART iCELink,
 #   jadi jumper J5 harus dilepas.

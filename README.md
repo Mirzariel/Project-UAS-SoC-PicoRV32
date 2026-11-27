@@ -56,8 +56,8 @@ Nama file mengikuti template baru. Setiap modul punya wrapper `.sv` di `rtl/soc_
 | CLK | P3 |
 | DIO | P2 |
 
-Pin ini sudah dicoba dan menyala di board. Pin dari template dosen (STB=P9, CLK=P4, DIO=P2)
-bisa dipilih dengan `PIN=dosen`. Di board kami, dengan pin dosen display sempat jalan sekitar
+Pin ini sudah dicoba dan menyala di board. Pin yang diberikan soal (STB=P9, CLK=P4, DIO=P2)
+bisa dipilih dengan `PIN=soal`. Di board kami, dengan pin soal display sempat jalan sekitar
 3 detik lalu macet saat iCELink aktif, walaupun jumper J5 (UART iCELink ke pin 4) sudah
 dilepas. Penyebabnya belum kami ketahui.
 
@@ -78,6 +78,7 @@ make pnr       place & route dengan nextpnr-ice40
 make bit       bitstream dengan icepack -> build/build_soc_picorv32/bitstream/top_soc_picorv32.bin
 make prog      upload ke iCESugar dengan icesprog
 make all       syn + pnr + bit
+make all SLANG=1   sama, tetapi Yosys membaca RTL dengan read_slang (lihat di bawah)
 make simgate   (tambahan) simulasi netlist hasil Yosys, jalankan setelah make syn
 make hex       (tambahan) ubah firmware.hex 1 byte/baris menjadi 1 word/baris
 make clean / make cleanall
@@ -95,6 +96,28 @@ make prog
 Bitstream yang sudah jadi juga ada di folder `bitstream/`, jadi bisa langsung diunggah dengan
 `icesprog bitstream/top_soc_picorv32.bin` atau dengan menyeret file `.bin` ke drive iCELink.
 
+## Dua cara sintesis (read_verilog dan read_slang)
+
+Template V2 dari dosen mengganti `read_verilog` dengan `read_slang` (plugin slang), karena
+pembaca bawaan Yosys tidak menerima semua cara menulis SystemVerilog interface. Proyek ini
+bisa disintesis dengan dua cara, dan file RTL-nya sama:
+
+| | Cara A (bawaan) | Cara B |
+|---|---|---|
+| Perintah | `make all` | `make all SLANG=1` |
+| Perintah baca di TCL | `read_verilog` / `read_verilog -sv` | `plugin -i slang` + `read_slang` |
+| Folder hasil | `build/build_soc_picorv32` | `build/build_soc_picorv32_slang` |
+| Bitstream | `top_soc_picorv32.bin` | `top_soc_picorv32_slang.bin` |
+| LUT / flip-flop / BRAM | 2317 / 922 / 20 | 2312 / 922 / 20 |
+| Sel logika (nextpnr) | 2651 / 5280 | 2655 / 5280 |
+| Fmax | 25,78 MHz | 22,88 MHz |
+| `make simgate` | PASS | PASS |
+
+Cara A butuh dua penyesuaian: sambungan interface ditulis `.s0(bus)` (bukan `.s0(bus.slave)`)
+dan `clk, rst_n` ditambahkan ke modport. Cara B menerima tulisan asli dosen, tetapi tulisan
+`.s0(bus)` tetap dipakai karena iverilog (`make sim`) menolak `.s0(bus.slave)`.
+Penjelasan lengkap ada di makalah Subbab 4.8 dan 6.8.
+
 ## Hasil
 
 | | |
@@ -105,7 +128,7 @@ Bitstream yang sudah jadi juga ada di folder `bitstream/`, jadi bisa langsung di
 | BRAM | 20 / 30 |
 | Fmax | 25,78 MHz (target 12 MHz) |
 | Bitstream | 104.090 byte |
-| Board | counter berjalan di 7-segment dan LED |
+| Board | counter berjalan di 7-segment dan LED (bitstream cara A) |
 
 Counter naik sekitar 1,9 juta per detik (1 putaran program = 19 clock pada 12 MHz), jadi
 digit kiri berganti pelan (digit ke-2 kira-kira tiap 9 detik), sedangkan digit kanan
@@ -126,3 +149,4 @@ Semua perubahan diberi komentar `diubah: ... karena ...` di file terkait.
 - `axi4_lite_gpio.v`: saat reset semua pin input (sesuai komentar di file itu).
 - `axi4_lite_tm1638.v` dan `axi4_lite_tm1638_wrapper.sv`: modul baru.
 - `Makefile`, `top_soc_picorv32.tcl`, `.pcf`, `setenv-oss.bat`: diperbaiki supaya bisa dijalankan.
+- `Makefile` dan `top_soc_picorv32.tcl`: ditambah pilihan `SLANG=1` untuk sintesis dengan `read_slang`.

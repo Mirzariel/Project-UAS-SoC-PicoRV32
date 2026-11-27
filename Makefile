@@ -12,10 +12,15 @@
 #   make build : syn + pnr + bit
 #   make clean / make cleanall
 #
+# Cara membaca RTL di make syn:
+#   (biasa)          cara A: read_verilog bawaan Yosys
+#   SLANG=1          cara B: read_slang (plugin slang, seperti template V2 dosen)
+#   contoh: make build SLANG=1   hasilnya di build/build_soc_picorv32_slang
+#
 # Pin TM1638:
 #   (biasa)          pin terbukti di board   STB=48 CLK=3 DIO=2
-#   PIN=dosen        pin dari dosen          STB=9  CLK=4 DIO=2
-#   contoh: make build PIN=dosen   lalu   make prog PIN=dosen
+#   PIN=soal         pin yang diberikan soal STB=9  CLK=4 DIO=2
+#   contoh: make build PIN=soal    lalu   make prog PIN=soal
 # ============================================================================
 
 # diubah: perintah di bawah memakai sintaks cmd.exe (if not exist, rmdir /S /Q),
@@ -25,7 +30,15 @@ SHELL = cmd.exe
 export PROJECT_NAME = soc_picorv32
 export TOP_LEVEL_PROJECT = top_$(PROJECT_NAME)
 export DIR_BUILD = build
+# diubah: pilihan cara membaca RTL (lihat tcl). Hasil cara B disimpan di
+# folder sendiri supaya hasil cara A tidak tertimpa dan bisa dibandingkan.
+SLANG ?= 0
+export SLANG
+ifeq ($(SLANG),1)
+export DIR_BUILD_PROJECT = $(DIR_BUILD)_$(PROJECT_NAME)_slang
+else
 export DIR_BUILD_PROJECT = $(DIR_BUILD)_$(PROJECT_NAME)
+endif
 
 export DIR_SIM = ../../sim
 export DIR_RTL = ../../rtl
@@ -43,13 +56,18 @@ export BOARD = icesugarv15
 # di template belum didefinisikan
 TOP_LEVEL = $(TOP_LEVEL_PROJECT)
 PIN ?= biasa
-ifeq ($(PIN),dosen)
-PCF_FILENAME = $(TOP_LEVEL_PROJECT)_$(BOARD)_pindosen.pcf
-BITSTREAM_FILENAME = $(TOP_LEVEL_PROJECT)_pindosen.bin
+ifeq ($(SLANG),1)
+AKHIRAN = _slang
+else
+AKHIRAN =
+endif
+ifeq ($(PIN),soal)
+PCF_FILENAME = $(TOP_LEVEL_PROJECT)_$(BOARD)_pinsoal.pcf
+BITSTREAM_FILENAME = $(TOP_LEVEL_PROJECT)_pinsoal$(AKHIRAN).bin
 else
 PCF_FILENAME = $(TOP_LEVEL_PROJECT)_$(BOARD).pcf
 # diubah: .bit -> .bin, icesprog dan drag-and-drop iCELink memakai file .bin
-BITSTREAM_FILENAME = $(TOP_LEVEL_PROJECT).bin
+BITSTREAM_FILENAME = $(TOP_LEVEL_PROJECT)$(AKHIRAN).bin
 endif
 
 # diubah: daftar file untuk simulasi (make sim). Simulasi dijalankan dari
@@ -128,7 +146,7 @@ prog:
 	icesprog $(DIR_BUILD)/$(DIR_BUILD_PROJECT)/$(DIR_BITSTREAM)/$(BITSTREAM_FILENAME)
 
 clean:
-	@echo deleting build_soc_picorv32
+	@echo deleting $(DIR_BUILD_PROJECT)
 	cd $(DIR_BUILD) && \
 	if exist $(DIR_BUILD_PROJECT) rmdir $(DIR_BUILD_PROJECT) /S /Q
 
